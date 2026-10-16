@@ -184,6 +184,9 @@ export default function PatentSearchPage() {
                 {results.map((item) => {
                   const phoneNum = item.phone || item.phone_number || item.tel
                   const userEmail = item.email
+                  
+                  /* === [ส่วนที่เพิ่ม 1]: ประกาศตัวแปรดึงเลขที่คำขอ === */
+                  const appNo = item.application_no || item.application_number || item.app_no
 
                   return (
                     <div
@@ -198,13 +201,29 @@ export default function PatentSearchPage() {
                       <div className={`flex flex-wrap justify-between items-start gap-2 border-b pb-3 transition-colors duration-300 ${
                         isDarkMode ? 'border-[#8C8C8C]' : 'border-slate-100'
                       }`}>
-                        <div>
-                          <span className={`text-xs font-medium ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>ชื่อผู้ประดิษฐ์ / นักวิจัย</span>
-                          <h3 className={`text-base font-bold group-hover:underline ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-                            {item.prefix && item.prefix !== 'NULL' ? `${item.prefix} ` : ''}
-                            {item.inventor_firstname} {item.inventor_lastname !== 'NULL' ? item.inventor_lastname : ''}
-                          </h3>
+                        
+                        {/* === [ส่วนที่แก้ไข 2]: ครอบ div จัด layout และเพิ่มป้ายแสดงเลขที่คำขอ === */}
+                        <div className="flex flex-wrap items-baseline gap-2">
+                          <div>
+                            <span className={`text-xs font-medium ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>ชื่อผู้ประดิษฐ์ / นักวิจัย</span>
+                            <h3 className={`text-base font-bold group-hover:underline ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                              {item.prefix && item.prefix !== 'NULL' ? `${item.prefix} ` : ''}
+                              {item.inventor_firstname} {item.inventor_lastname !== 'NULL' ? item.inventor_lastname : ''}
+                            </h3>
+                          </div>
+
+                          {/* เพิ่ม UI แสดงเลขที่คำขอข้างชื่อ */}
+                          {appNo && appNo !== 'NULL' && (
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border transition-colors ${
+                              isDarkMode 
+                                ? 'bg-slate-800/80 border-slate-700 text-slate-300' 
+                                : 'bg-slate-100 border-slate-200 text-slate-600'
+                            }`}>
+                              เลขที่คำขอ: {appNo}
+                            </span>
+                          )}
                         </div>
+                        {/* ============================================================= */}
                         
                         <div className="flex gap-2">
                           {item.patent_type && item.patent_type !== 'NULL' && (
