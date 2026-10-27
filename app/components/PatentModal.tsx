@@ -227,7 +227,7 @@ export default function PatentModal({ patent, onClose, isDarkMode = false }: Pat
 
           {/* application_no ➔ ฝัง application_file_url */}
           <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-            <span className="text-xs text-slate-400 block">เลขที่ยื่นคำขอ</span>
+            <span className="text-xs text-slate-400 block">เลขที่คำขอ</span>
             {renderValueWithLink(patent.application_no, patent.application_file_url)}
           </div>
 
@@ -255,6 +255,13 @@ export default function PatentModal({ patent, onClose, isDarkMode = false }: Pat
             <span className="text-xs text-slate-400 block">เลขที่หนังสือรับรอง</span>
             {renderValueWithLink(patent.cert_number, patent.cert_file_url)}
           </div>
+
+
+           <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <span className="text-xs text-slate-400 block">เลขที่สิทธิบัตร</span>
+            <span className={`font-semibold ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>{formatVal(patent.registration_no)}</span>
+          </div>
+
 
            <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
             <span className="text-xs text-slate-400 block mb-1">ไฟล์คำขอที่ได้รับการจดทะเบียน (หนังสือสำคัญ)</span>

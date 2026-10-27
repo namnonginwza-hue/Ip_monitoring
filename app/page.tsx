@@ -62,7 +62,7 @@ export default function PatentSearchPage() {
     setErrorMessage(null)
 
     try {
-      let query = supabase.from('ip_mornitoring_25_10_69').select('*')
+      let query = supabase.from('ip_mornitoring_27_10_69').select('*')
 
       if (cleanSearch) {
         query = query.or(`inventor_firstname.ilike.%${cleanSearch}%,inventor_lastname.ilike.%${cleanSearch}%`)
@@ -341,7 +341,7 @@ export default function PatentSearchPage() {
                           </div>
                         </div>
 
-                        {/* แสดง เลขที่ยื่นคำขอ และ เลขที่คำขอ ที่มุมขวาล่างตามลำดับ */}
+                        {/* แสดง เลขที่คำขอ และ เลขที่สิทธิบัตร  ที่มุมขวาล่างตามลำดับ */}
                         <div className="flex flex-wrap items-center gap-2 ml-auto">
                           {/* 1. เลขที่ยื่นคำขอ (application_no) */}
                           {appNo && appNo !== 'NULL' && appNo !== '-' && (
@@ -350,18 +350,18 @@ export default function PatentSearchPage() {
                                 ? 'bg-indigo-950/80 border-indigo-800 text-indigo-200' 
                                 : 'bg-indigo-50 border-indigo-200 text-indigo-700'
                             }`}>
-                              เลขที่ยื่นคำขอ: {appNo}
+                              เลขที่คำขอ: {appNo}
                             </span>
                           )}
 
-                          {/* 2. เลขที่คำขอ (registration_no) */}
+                          {/* 2. เลขที่สิทธิบัตร (registration_no) */}
                           {regNo && regNo !== 'NULL' && regNo !== '-' && (
                             <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border transition-colors ${
                               isDarkMode 
                                 ? 'bg-slate-800/80 border-slate-700 text-slate-300' 
                                 : 'bg-slate-100 border-slate-200 text-slate-600'
                             }`}>
-                              เลขที่คำขอ: {regNo}
+                              เลขที่สิทธิบัตร: {regNo}
                             </span>
                           )}
                         </div>
