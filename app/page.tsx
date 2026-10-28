@@ -2,8 +2,15 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { Noto_Sans_Thai } from 'next/font/google'
 import { supabase } from '../lib/supabaseClient'
 import PatentModal from './components/PatentModal'
+
+const notoSansThai = Noto_Sans_Thai({
+  subsets: ['thai', 'latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+})
 
 export interface PatentItem {
   id: number
@@ -21,6 +28,7 @@ export interface PatentItem {
   application_date?: string
   app_date?: string
   filing_date?: string
+  draft_status?: string
   application_no?: string
   application_number?: string
   app_no?: string
@@ -37,10 +45,8 @@ export interface PatentItem {
 }
 
 export default function PatentSearchPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [facultyTerm, setFacultyTerm] = useState('')
-  const [yearTerm, setYearTerm] = useState('')
-  const [patentTypeTerm, setPatentTypeTerm] = useState('') // เพิ่ม State สำหรับประเภทสิทธิบัตร
+  const [searchField, setSearchField] = useState('year_received') // ฟิลด์ที่เลือกจาก Dropdown
+  const [keyword, setKeyword] = useState('') // คำค้นหา
   
   const [results, setResults] = useState<PatentItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -49,42 +55,47 @@ export default function PatentSearchPage() {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedPatent, setSelectedPatent] = useState<PatentItem | null>(null)
 
+  // กำหนดข้อความ Placeholder ตามฟิลด์ที่เลือก
+  const getPlaceholder = () => {
+    switch (searchField) {
+      case 'year_received':
+        return 'เช่น 69, 68...'
+      case 'inventor':
+        return 'เช่น วลีพร, พัชราภรณ์...'
+      case 'faculty_dept':
+        return 'เช่น วิศวกรรมเครื่องกล มก....'
+      case 'patent_type':
+        return 'เช่น อนุสิทธิบัตร, ลิขสิทธิ์...'
+      case 'draft_status':
+        return 'เช่น รอยกร่าง, ร่างแล้ว...'
+      default:
+        return 'ป้อนคำที่ต้องการค้นหา'
+    }
+  }
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    const cleanSearch = searchTerm.trim()
-    const cleanFaculty = facultyTerm.trim()
-    const cleanYear = yearTerm.trim()
-    const cleanPatentType = patentTypeTerm.trim()
-
-    // ถ้าไม่ได้กรอกช่องไหนเลย ให้หยุด
-    if (!cleanSearch && !cleanFaculty && !cleanYear && !cleanPatentType) return
+    const cleanKeyword = keyword.trim()
+    if (!cleanKeyword) return
 
     setLoading(true)
     setHasSearched(true)
     setErrorMessage(null)
 
     try {
-      let query = supabase.from('ip_mornitoring_27_10_69').select('*')
+      let query = supabase.from('ip_mornitoring_28_10_69').select('*')
 
-      // 1. เงื่อนไขค้นหาชื่อ-นามสกุล
-      if (cleanSearch) {
-        query = query.or(`inventor_firstname.ilike.%${cleanSearch}%,inventor_lastname.ilike.%${cleanSearch}%`)
-      }
-
-      // 2. เงื่อนไขค้นหาคณะ หรือภาควิชา
-      if (cleanFaculty) {
-        query = query.or(`faculty.ilike.%${cleanFaculty}%,department.ilike.%${cleanFaculty}%`)
-      }
-
-      // 3. เงื่อนไขค้นหาปีที่รับเรื่อง
-      if (cleanYear) {
-        query = query.eq('year_received', cleanYear)
-      }
-
-      // 4. เงื่อนไขค้นหาประเภทสิทธิบัตร
-      if (cleanPatentType) {
-        query = query.ilike('patent_type', `%${cleanPatentType}%`)
+      if (searchField === 'year_received') {
+        query = query.eq('year_received', cleanKeyword)
+      } else if (searchField === 'inventor') {
+        query = query.or(`inventor_firstname.ilike.%${cleanKeyword}%,inventor_lastname.ilike.%${cleanKeyword}%`)
+      } else if (searchField === 'faculty_dept') {
+        query = query.or(`faculty.ilike.%${cleanKeyword}%,department.ilike.%${cleanKeyword}%`)
+      } else if (searchField === 'patent_type') {
+        query = query.ilike('patent_type', `%${cleanKeyword}%`)
+      } else if (searchField === 'draft_status') {
+        query = query.ilike('draft_status', `%${cleanKeyword}%`)
       }
 
       const { data, error } = await query
@@ -106,7 +117,7 @@ export default function PatentSearchPage() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
+    <div className={`${notoSansThai.className} min-h-screen transition-colors duration-300 ${
       isDarkMode ? 'bg-[#030202] text-slate-100' : 'bg-slate-50 text-slate-800'
     }`}>
       {/* Header */}
@@ -141,115 +152,81 @@ export default function PatentSearchPage() {
 
           <div className="text-center md:text-left space-y-2 flex-1">
             <span className="bg-blue-600/40 text-blue-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block">
-              ระบบฐานข้อมูลสิทธิบัตรและผลงานวิจัย บริษัท วีไอพี โปรดักส์ แอนด์ เซอร์วิส จำกัด
+              ฐานข้อมูล บริษัท วีไอพี โปรดักส์ แอนด์ เซอร์วิส จำกัด
             </span>
             <h1 className="text-2xl md:text-4xl font-bold tracking-tight">
-              ระบบค้นหาผลงานสิทธิบัตรรายบุคคล
+              ระบบค้นหาผลงานด้านทรัพย์สินทางปัญญา
             </h1>
             <p className="text-blue-200 text-sm md:text-base">
-              สืบค้นข้อมูลผลงานสิทธิบัตร / อนุสิทธิบัตร / เครื่องหมายการค้า ของอาจารย์และนักวิจัย
+              ข้อมูลผลงานสิทธิบัตรการประดิษฐ์ / อนุสิทธิบัตร / สิทธิบัตรการออกเเบบผลิตภัณฑ์ / เครื่องหมายการค้า / สิขสิทธิ์
             </p>
+            <span className=" text-white-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block">
+              Tel : 063-416-6884,063-416-6802  E-mail : vipteam365@gmail.com,vippatent365@gmail.com Line : @vipteam365
+            </span>
           </div>
         </div>
       </header>
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        {/* Search Form (ปรับเป็น 4 ช่องค้นหา) */}
-        <div className={`p-6 md:p-8 rounded-xl shadow-sm border transition-colors duration-300 ${
-          isDarkMode ? 'bg-[#080712] border-[#8C8C8C]' : 'bg-white border-slate-200'
-        }`}>
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        
+        {/* Modern Combined Search Bar */}
+        <div className="space-y-1.5">
+          <div className={`p-2 rounded-2xl shadow-md border transition-colors duration-300 ${
+            isDarkMode ? 'bg-[#080712] border-[#8C8C8C]' : 'bg-white border-slate-200'
+          }`}>
+            <form onSubmit={handleSearch} className="flex flex-col md:flex-row items-center gap-2">
               
-              {/* ช่องที่ 1: ปีที่รับ */}
-              <div>
-                <label htmlFor="year" className={`block text-xs font-semibold mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                  ปีที่รับงาน
-                </label>
+              {/* Dropdown เลือกหัวข้อการค้นหา */}
+              <div className={`w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r ${isDarkMode ? 'border-[#8C8C8C]' : 'border-slate-200'} px-3 py-2`}>
+                <select
+                  value={searchField}
+                  onChange={(e) => setSearchField(e.target.value)}
+                  className={`w-full bg-transparent focus:outline-none text-sm font-semibold cursor-pointer ${
+                    isDarkMode ? 'text-white' : 'text-slate-700'
+                  }`}
+                >
+                  <option value="year_received" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ปีที่รับงาน</option>
+                  <option value="inventor" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ชื่อผู้ประดิษฐ์ หรือ นามสกุล</option>
+                  <option value="faculty_dept" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ภาค/คณะ หรือ หน่วยงาน</option>
+                  <option value="patent_type" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ประเภทสิทธิบัตร</option>
+                  <option value="draft_status" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>สถานะการทำงาน</option>
+                </select>
+              </div>
+
+              {/* ช่องกรอกคำค้นหา */}
+              <div className="flex-1 w-full px-3 py-2">
                 <input
-                  id="year"
                   type="text"
-                  value={yearTerm}
-                  onChange={(e) => setYearTerm(e.target.value)}
-                  placeholder="เช่น 68019 หรือ 2566..."
-                  className={`w-full px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm transition-colors ${
-                    isDarkMode
-                      ? 'border-[#8C8C8C] bg-[#030202] text-white placeholder-slate-500'
-                      : 'border-slate-300 bg-white text-slate-900 placeholder-slate-400'
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder={getPlaceholder()}
+                  className={`w-full bg-transparent focus:outline-none text-sm ${
+                    isDarkMode ? 'text-white placeholder-slate-500' : 'text-slate-900 placeholder-slate-400'
                   }`}
                 />
               </div>
 
-              {/* ช่องที่ 2: ชื่อ หรือ นามสกุล ผู้ประดิษฐ์ */}
-              <div>
-                <label htmlFor="search" className={`block text-xs font-semibold mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                  ชื่อผู้ประดิษฐ์ หรือ นามสกุล
-                </label>
-                <input
-                  id="search"
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="เช่น เกรียงไกร, ชินธันย์..."
-                  className={`w-full px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm transition-colors ${
-                    isDarkMode
-                      ? 'border-[#8C8C8C] bg-[#030202] text-white placeholder-slate-500'
-                      : 'border-slate-300 bg-white text-slate-900 placeholder-slate-400'
-                  }`}
-                />
+              {/* ปุ่มค้นหา */}
+              <div className="w-full md:w-auto shrink-0 p-1">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full md:w-auto bg-[#a32d1d] hover:bg-[#8b2416] text-white font-medium px-8 py-3 rounded-xl transition duration-200 disabled:opacity-50 text-sm shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {loading ? 'กำลังค้นหา...' : 'ค้นหา'}
+                </button>
               </div>
 
-              {/* ช่องที่ 3: ภาค/คณะ หรือ หน่วยงาน */}
-              <div>
-                <label htmlFor="faculty" className={`block text-xs font-semibold mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                  ภาค/คณะ หรือ หน่วยงาน
-                </label>
-                <input
-                  id="faculty"
-                  type="text"
-                  value={facultyTerm}
-                  onChange={(e) => setFacultyTerm(e.target.value)}
-                  placeholder="เช่น วิศวกรรมวัสดุ, วิศวกรรม..."
-                  className={`w-full px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm transition-colors ${
-                    isDarkMode
-                      ? 'border-[#8C8C8C] bg-[#030202] text-white placeholder-slate-500'
-                      : 'border-slate-300 bg-white text-slate-900 placeholder-slate-400'
-                  }`}
-                />
-              </div>
+            </form>
+          </div>
 
-              {/* ช่องที่ 4: ประเภทสิทธิบัตร (เพิ่มใหม่) */}
-              <div>
-                <label htmlFor="patentType" className={`block text-xs font-semibold mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                  ประเภทสิทธิบัตร
-                </label>
-                <input
-                  id="patentType"
-                  type="text"
-                  value={patentTypeTerm}
-                  onChange={(e) => setPatentTypeTerm(e.target.value)}
-                  placeholder="เช่น อนุสิทธิบัตร, สิทธิบัตร..."
-                  className={`w-full px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm transition-colors ${
-                    isDarkMode
-                      ? 'border-[#8C8C8C] bg-[#030202] text-white placeholder-slate-500'
-                      : 'border-slate-300 bg-white text-slate-900 placeholder-slate-400'
-                  }`}
-                />
-              </div>
-
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-2.5 rounded-lg transition duration-200 disabled:bg-blue-800/50 disabled:text-slate-300 flex items-center justify-center gap-2 text-sm w-full md:w-auto"
-              >
-                {loading ? <span>กำลังค้นหา...</span> : <span>🔍 ค้นหาข้อมูล</span>}
-              </button>
-            </div>
-          </form>
+          {/* ข้อความกำกับด้านล่างซ้ายของช่อง search */}
+          <div className="px-1">
+            <span className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              สืบค้นจากทุกข้อมูลหลัก: ปีที่รับงาน, ชื่อผู้ประดิษฐ์ หรือ นามสกุล, ภาค/คณะ หรือ หน่วยงาน, ประเภทสิทธิบัตร, สถานะการทำงาน
+            </span>
+          </div>
         </div>
 
         {errorMessage && (
@@ -289,13 +266,14 @@ export default function PatentSearchPage() {
                   const phoneNum = item.phone_number
                   const userEmail = item.email
                   
-                  // 1. เลขที่คำขอ ( application_no )
                   const rawAppNo = item.application_no || item.application_number || item.app_no
                   const appNoVal = (!rawAppNo || rawAppNo === 'NULL' || rawAppNo === '-') ? 'ไม่มี' : rawAppNo
 
-                  // 2. เลขที่สิทธิบัตร ( registration_no )
                   const rawRegNo = item.registration_no || item.register_no
                   const regNoVal = (!rawRegNo || rawRegNo === 'NULL' || rawRegNo === '-') ? 'ไม่มี' : rawRegNo
+
+                  const rawStatus = item.draft_status
+                  const statusVal = (!rawStatus || rawStatus === 'NULL' || rawStatus === '-') ? 'ไม่มี' : rawStatus
                   
                   const inventionTitle = item.new_title || item.original_title || item.invention_name || item.title
 
@@ -361,7 +339,7 @@ export default function PatentSearchPage() {
                         </p>
                       </div>
 
-                      {/* ส่วนท้าย Card: อีเมล, เบอร์โทรศัพท์ และ เลขที่คำขอ / เลขที่สิทธิบัตร */}
+                      {/* ส่วนท้าย Card */}
                       <div className={`pt-3 border-t text-xs flex flex-wrap items-center justify-between gap-3 ${
                         isDarkMode ? 'border-[#8C8C8C]/50 text-slate-400' : 'border-slate-100 text-slate-500'
                       }`}>
@@ -380,8 +358,15 @@ export default function PatentSearchPage() {
                           </div>
                         </div>
 
-                        {/* แสดง เลขที่คำขอ และ เลขที่สิทธิบัตร */}
                         <div className="flex flex-wrap items-center gap-2 ml-auto">
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border transition-colors ${
+                            isDarkMode 
+                              ? 'bg-amber-950/80 border-amber-800 text-amber-200' 
+                              : 'bg-amber-50 border-amber-200 text-amber-800'
+                          }`}>
+                            สถานะการทำงาน : {statusVal}
+                          </span>
+
                           <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border transition-colors ${
                             isDarkMode 
                               ? 'bg-indigo-950/80 border-indigo-800 text-indigo-200' 
@@ -408,7 +393,7 @@ export default function PatentSearchPage() {
                 isDarkMode ? 'bg-[#080712] border-[#8C8C8C]' : 'bg-white border-slate-200'
               }`}>
                 <p className={`font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>ไม่พบผลงานสิทธิบัตรตามเงื่อนไขที่ค้นหา</p>
-                <p className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>ลองตรวจสอบคำค้นหา หรือเว้นบางช่องว่างเพื่อขยายขอบเขต</p>
+                <p className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>ลองตรวจสอบคำค้นหา หรือเปลี่ยนหัวข้อการค้นหาใหม่</p>
               </div>
             )}
           </div>

@@ -165,14 +165,14 @@ export default function PatentModal({ patent, onClose, isDarkMode = false }: Pat
 
 
 
-           <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+          <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
             <span className="text-xs text-slate-400 block mb-1">ไฟล์ข้อมูลดิบลูกค้า(zip)</span>
             {renderUrlLink(patent.raw_data_url_zip, 'ไฟล์ข้อมูลดิบลูกค้า')} 
           </div>
           
           <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-            <span className="text-xs text-slate-400 block mb-1">ไฟล์ต้นเรื่อง(ทป.01/05)</span>
-            {renderUrlLink(patent.tp0105_file_url, 'ไฟล์ต้นเรื่อง ทป.01/05')} 
+            <span className="text-xs text-slate-400 block">สถานะการทำงาน</span>
+            <span className={`font-semibold ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>{formatVal(patent.draft_status)}</span>
           </div>
 
 
@@ -186,6 +186,11 @@ export default function PatentModal({ patent, onClose, isDarkMode = false }: Pat
           <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
             <span className="text-xs text-slate-400 block mb-1">ไฟล์งานฉบับยื่นกรม(เวิร์ด)</span>
             {renderUrlLink(patent.submission_file_url_word, 'ไฟล์งานฉบับยื่นกรม')}  
+          </div>
+
+          <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-[#030202] border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <span className="text-xs text-slate-400 block mb-1">ไฟล์ต้นเรื่อง(ทป.01/05)</span>
+            {renderUrlLink(patent.tp0105_file_url, 'ไฟล์ต้นเรื่อง ทป.01/05')} 
           </div>
 
           
