@@ -84,7 +84,7 @@ export default function PatentSearchPage() {
     setErrorMessage(null)
 
     try {
-      let query = supabase.from('ip_mornitoring_28_10_69').select('*')
+      let query = supabase.from('ip_mornitoring_29_10_69').select('*')
 
       if (searchField === 'year_received') {
         query = query.eq('year_received', cleanKeyword)
@@ -155,10 +155,10 @@ export default function PatentSearchPage() {
               ฐานข้อมูล บริษัท วีไอพี โปรดักส์ แอนด์ เซอร์วิส จำกัด
             </span>
             <h1 className="text-2xl md:text-4xl font-bold tracking-tight">
-              ระบบค้นหาผลงานด้านทรัพย์สินทางปัญญา
+              ระบบค้นหาข้อมูลด้านทรัพย์สินทางปัญญา
             </h1>
             <p className="text-blue-200 text-sm md:text-base">
-              ข้อมูลผลงานสิทธิบัตรการประดิษฐ์ / อนุสิทธิบัตร / สิทธิบัตรการออกเเบบผลิตภัณฑ์ / เครื่องหมายการค้า / สิขสิทธิ์
+              สิทธิบัตรการประดิษฐ์ / อนุสิทธิบัตร / สิทธิบัตรการออกเเบบผลิตภัณฑ์ / เครื่องหมายการค้า / สิขสิทธิ์
             </p>
             <span className=" text-white-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block">
               Tel : 063-416-6884,063-416-6802  E-mail : vipteam365@gmail.com,vippatent365@gmail.com Line : @vipteam365
