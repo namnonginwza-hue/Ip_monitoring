@@ -94,6 +94,8 @@ export default function PatentSearchPage() {
         query = query.or(`faculty.ilike.%${cleanKeyword}%,department.ilike.%${cleanKeyword}%`)
       } else if (searchField === 'patent_type') {
         query = query.ilike('patent_type', `%${cleanKeyword}%`)
+      } else if (searchField === 'application_no') {
+        query = query.ilike('application_no', `%${cleanKeyword}%`)
       } else if (searchField === 'draft_status') {
         query = query.ilike('draft_status', `%${cleanKeyword}%`)
       }
@@ -190,6 +192,7 @@ export default function PatentSearchPage() {
                   <option value="inventor" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ชื่อผู้ประดิษฐ์ หรือ นามสกุล</option>
                   <option value="faculty_dept" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ภาค/คณะ หรือ หน่วยงาน</option>
                   <option value="patent_type" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>ประเภทสิทธิบัตร</option>
+                  <option value="application_no" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>เลขที่คำขอ</option>
                   <option value="draft_status" className={isDarkMode ? 'bg-[#080712] text-white' : 'bg-white text-slate-800'}>สถานะการทำงาน</option>
                 </select>
               </div>
