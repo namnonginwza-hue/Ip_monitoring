@@ -84,7 +84,7 @@ export default function PatentSearchPage() {
     setErrorMessage(null)
 
     try {
-      let query = supabase.from('ip_mornitoring_29_10_69').select('*')
+      let query = supabase.from('ip_mornitoring_3_11_69').select('*')
 
       if (searchField === 'year_received') {
         query = query.eq('year_received', cleanKeyword)
@@ -160,7 +160,7 @@ export default function PatentSearchPage() {
               ระบบค้นหาข้อมูลด้านทรัพย์สินทางปัญญา
             </h1>
             <p className="text-blue-200 text-sm md:text-base">
-              สิทธิบัตรการประดิษฐ์ / อนุสิทธิบัตร / สิทธิบัตรการออกเเบบผลิตภัณฑ์ / เครื่องหมายการค้า / สิขสิทธิ์
+              สิทธิบัตรการประดิษฐ์ / อนุสิทธิบัตร / สิทธิบัตรการออกเเบบผลิตภัณฑ์ / เครื่องหมายการค้า / ลิขสิทธิ์
             </p>
             <span className=" text-white-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block">
               Tel : 063-416-6884,063-416-6802  E-mail : vipteam365@gmail.com,vippatent365@gmail.com Line : @vipteam365
@@ -306,10 +306,10 @@ export default function PatentSearchPage() {
                           {/* ภาควิชา/หน่วยงาน และ สังกัดคณะ ด้านบน */}
                           <div className={`text-xs flex flex-wrap gap-x-3 gap-y-1 pt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                             {item.department && item.department !== 'NULL' && item.department !== '-' && (
-                              <span>ภาควิชา/หน่วยงาน: <strong className={isDarkMode ? 'text-slate-300' : 'text-slate-700'}>{item.department}</strong></span>
+                              <span>หน่วยงาน: <strong className={isDarkMode ? 'text-slate-300' : 'text-slate-700'}>{item.department}</strong></span>
                             )}
                             {item.faculty && item.faculty !== 'NULL' && item.faculty !== '-' && (
-                              <span>สังกัดคณะ: <strong className={isDarkMode ? 'text-slate-300' : 'text-slate-700'}>{item.faculty}</strong></span>
+                              <span>ภาควิชา/คณะ: <strong className={isDarkMode ? 'text-slate-300' : 'text-slate-700'}>{item.faculty}</strong></span>
                             )}
                           </div>
                         </div>
