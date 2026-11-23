@@ -84,7 +84,7 @@ export default function PatentSearchPage() {
     setErrorMessage(null)
 
     try {
-      let query = supabase.from('ip_mornitoring_10_11_69').select('*')
+      let query = supabase.from('ip_mornitoring_69').select('*')
 
       if (searchField === 'year_received') {
         query = query.eq('year_received', cleanKeyword)
